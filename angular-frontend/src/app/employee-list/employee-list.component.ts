@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class EmployeeListComponent implements OnInit {
 
   employees: Employee[];
+  search: string = "";
 
   constructor(private employeeService: EmployeeService,
     private router: Router) { }
@@ -18,24 +19,39 @@ export class EmployeeListComponent implements OnInit {
     this.getEmployees();
   }
 
-  private getEmployees(){
+  searchForEmployees() {
+    if (this.search !== "") {
+      this.employeeService.searchEmployeesList(this.search).subscribe(data => {
+        this.employees = data;
+      });
+    } else {
+      this.getEmployees();
+    }
+  }
+
+  private getEmployees() {
     this.employeeService.getEmployeesList().subscribe(data => {
       this.employees = data;
     });
   }
 
-  employeeDetails(id: number){
+  employeeDetails(id: number) {
     this.router.navigate(['employee-details', id]);
   }
 
-  updateEmployee(id: number){
+  updateEmployee(id: number) {
     this.router.navigate(['update-employee', id]);
   }
 
-  deleteEmployee(id: number){
-    this.employeeService.deleteEmployee(id).subscribe( data => {
-      console.log(data);
-      this.getEmployees();
-    })
+  deleteEmployee(id: number) {
+    if (confirm("Do you want to delete this employee?")) {
+      this.employeeService.deleteEmployee(id).subscribe(data => {
+        console.log(data);
+        this.getEmployees();
+      })
+    } else {
+      alert("Okay your data still safe !");
+    }
+
   }
 }
